@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, snapshot-dashboard]
+    runs-on: [self-hosted]
     env:
       DEPLOY_DIR: /opt/snapshot-dashboard
       SERVICE: snapshot-dashboard

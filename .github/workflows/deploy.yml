@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync source
-        run: rsync -a --delete --exclude '.git' --exclude 'node_modules' --exclude 'data' ./ "$DEPLOY_DIR/"
+        run: rsync -a --delete --exclude '.git' --exclude 'node_modules' --exclude 'data' ./ "$DEPLOY_DIR/" --exclude '.env'
 
       - name: Build & Deploy
         working-directory: ${{ env.DEPLOY_DIR }}

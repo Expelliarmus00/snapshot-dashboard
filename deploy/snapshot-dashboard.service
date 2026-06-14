@@ -1,0 +1,23 @@
+# /etc/systemd/system/snapshot-dashboard.service
+#
+#   sudo cp deploy/snapshot-dashboard.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now snapshot-dashboard
+
+[Unit]
+Description=Snapshot Media Dashboard (Fastify)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/snapshot-dashboard
+EnvironmentFile=/opt/snapshot-dashboard/.env
+ExecStart=/usr/bin/node dist/server.js
+Restart=always
+RestartSec=3
+User=www-data
+# Données SQLite persistées hors du dossier synchronisé par le déploiement.
+Environment=DATABASE_URL=file:/opt/snapshot-dashboard-data/dashboard.db
+
+[Install]
+WantedBy=multi-user.target

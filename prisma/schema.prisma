@@ -1,0 +1,38 @@
+// Schéma Prisma — portail Snapshot Media
+// SQLite (fichier auto-contenu) pour rester sans dépendance externe.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Comptes whitelistés + sessions (auth magic-link, calqué sur snapshot-offres).
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  magicToken       String?
+  magicExpiresAt   DateTime?
+  sessionToken     String?
+  sessionExpiresAt DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+// App Patrimoine — configuration (blob JSON, 1 ligne).
+model PatrimoineConfig {
+  id   Int    @id
+  json String
+}
+
+// App Patrimoine — historique 3a APPEND-ONLY (suppression explicite uniquement).
+model Historique {
+  id        String   @id
+  date      String
+  contratId String
+  valeur    Float
+  createdAt DateTime @default(now())
+}

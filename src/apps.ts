@@ -18,7 +18,7 @@ export const APPS: AppEntry[] = [
     slug: 'patrimoine',
     name: 'Patrimoine immobilier',
     tagline: 'Financement, cash-flow & amortissement 3a — Auboranges (FR)',
-    href: '/apps/patrimoine/',
+    href: 'https://patrimoine.snapshotmedia.ch',
     icon: 'house',
     status: 'live',
     accent: true,

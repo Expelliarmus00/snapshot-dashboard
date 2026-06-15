@@ -8,9 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { prisma } from './db/client.js';
 import { authRoutes } from './routes/auth.js';
-import { patrimoineRoutes } from './routes/patrimoine.js';
 import { appsRoutes } from './routes/apps.js';
 import { authMiddleware } from './middleware/auth.js';
+import { findUserBySession, SESSION_COOKIE_NAME } from './services/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
@@ -27,7 +27,13 @@ const app = Fastify({
 });
 
 await app.register(cors, {
-  origin: [config.APP_URL],
+  origin: (origin, cb) => {
+    // Accepte tout sous-domaine snapshotmedia.ch + localhost en dev
+    if (!origin) return cb(null, true);
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return cb(null, true);
+    if (/^https:\/\/[a-z0-9-]+\.snapshotmedia\.ch$/.test(origin)) return cb(null, true);
+    cb(new Error('CORS: origin not allowed'), false);
+  },
   credentials: true,
 });
 
@@ -59,12 +65,25 @@ app.get('/health', async () => {
 // Auth routes (public)
 await app.register(authRoutes, { prefix: '/api/auth' });
 
+// Route publique : validation de session cross-origin pour les mini-apps
+app.get('/api/auth/validate', async (request, reply) => {
+  const cookie = request.cookies[SESSION_COOKIE_NAME];
+  if (!cookie) return reply.send({ valid: false });
+
+  const unsigned = request.unsignCookie(cookie);
+  if (!unsigned.valid || !unsigned.value) return reply.send({ valid: false });
+
+  const user = await findUserBySession(unsigned.value);
+  if (!user) return reply.send({ valid: false });
+
+  return reply.send({ valid: true, user: { id: user.id, email: user.email } });
+});
+
 // Routes protégées (session requise)
 await app.register(
   async (instance) => {
     instance.addHook('preHandler', authMiddleware);
     await instance.register(appsRoutes);
-    await instance.register(patrimoineRoutes, { prefix: '/patrimoine' });
   },
   { prefix: '/api' },
 );

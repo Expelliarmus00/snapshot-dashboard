@@ -73,6 +73,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       sameSite: 'lax',
       signed: true,
       maxAge: maxAgeSec,
+      domain: '.snapshotmedia.ch',
     });
   }
 
@@ -115,7 +116,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
         await clearSession(unsigned.value);
       }
     }
-    reply.clearCookie(SESSION_COOKIE_NAME, { path: '/' });
+    reply.clearCookie(SESSION_COOKIE_NAME, { path: '/', domain: '.snapshotmedia.ch' });
     return { ok: true };
   });
 

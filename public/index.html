@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Snapshot Media — Dashboard</title>
+<style>
+@font-face{font-family:'Switzer';src:url('fonts/Switzer-Regular.otf') format('opentype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Switzer';src:url('fonts/Switzer-Medium.otf') format('opentype');font-weight:500;font-display:swap;}
+@font-face{font-family:'Switzer';src:url('fonts/Switzer-Semibold.otf') format('opentype');font-weight:600;font-display:swap;}
+@font-face{font-family:'Switzer';src:url('fonts/Switzer-Bold.otf') format('opentype');font-weight:700;font-display:swap;}
+@font-face{font-family:'Satoshi';src:url('fonts/Satoshi-Regular.otf') format('opentype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Satoshi';src:url('fonts/Satoshi-Medium.otf') format('opentype');font-weight:500;font-display:swap;}
+@font-face{font-family:'Satoshi';src:url('fonts/Satoshi-Bold.otf') format('opentype');font-weight:700;font-display:swap;}
+
+:root{
+  --canvas:#ECECEC; --surface:#FFFFFF; --surface-2:#F5F5F5;
+  --border:#EAEAEA; --border-strong:#CFCFCF;
+  --ink:#0B0B0B; --ink-2:#4A4D54; --ink-3:#8A8A8A;
+  --forest:#1D2026; --coral:#ED5847; --coral-50:#E53A26; --coral-deep:#B82D1C; --coral-soft:#F6ABA2;
+  --font-display:'Switzer',-apple-system,sans-serif;
+  --font-body:'Satoshi',-apple-system,sans-serif;
+  --sh:0 1px 2px rgba(11,11,11,.05), 0 6px 18px rgba(11,11,11,.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0; min-height:100%;}
+body{background:var(--canvas); color:var(--ink); font-family:var(--font-body); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+h1,h2,h3{margin:0; font-family:var(--font-display); font-weight:600; letter-spacing:-.02em;}
+button{font-family:inherit; cursor:pointer;}
+.ic-svg{width:18px; height:18px; flex:none;}
+
+/* ---------- topbar ---------- */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px clamp(20px,4vw,48px); border-bottom:1px solid var(--border); background:var(--canvas);}
+.brand{display:flex; align-items:center; gap:13px;}
+.brand-mark{width:38px; height:38px; border-radius:11px; background:linear-gradient(150deg,#2A2E36,#1D2026); border:1px solid rgba(255,255,255,.12); display:grid; place-items:center; color:var(--coral);}
+.brand-name{font-family:var(--font-display); font-weight:600; font-size:16px; color:var(--ink); line-height:1;}
+.brand-sub{font-size:11px; color:var(--ink-3); margin-top:4px; letter-spacing:.06em; text-transform:uppercase;}
+.user-box{display:flex; align-items:center; gap:12px; font-size:13px; color:var(--ink-2);}
+.user-email{font-weight:600; color:var(--ink);}
+.logout-btn{display:inline-flex; align-items:center; gap:7px; background:var(--surface); color:var(--ink); border:1px solid var(--border-strong); border-radius:10px; padding:8px 13px; font-size:13px; font-weight:600;}
+.logout-btn:hover{background:var(--surface-2); border-color:var(--ink-3);}
+
+/* ---------- page ---------- */
+.wrap{max-width:1100px; margin:0 auto; padding:44px clamp(20px,4vw,48px) 80px;}
+.page-kicker{font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);}
+.page-title{font-size:30px; margin-top:8px; letter-spacing:-.025em;}
+.page-lead{font-size:15px; color:var(--ink-2); margin-top:10px; max-width:560px;}
+
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:20px; margin-top:34px;}
+.app-card{display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:24px; box-shadow:var(--sh); text-decoration:none; color:inherit; transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;}
+.app-card:hover{transform:translateY(-3px); border-color:var(--border-strong); box-shadow:0 2px 4px rgba(11,11,11,.06),0 14px 34px rgba(11,11,11,.10);}
+.app-card.soon{opacity:.62; pointer-events:none;}
+.card-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.card-icon{width:46px; height:46px; border-radius:13px; display:grid; place-items:center; background:var(--surface-2); border:1px solid var(--border); color:var(--ink);}
+.app-card.accent .card-icon{background:#FDECE9; border-color:var(--coral-soft); color:var(--coral-deep);}
+.pill{font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; border-radius:7px; padding:4px 9px;}
+.pill.live{background:#FDECE9; color:var(--coral-deep);}
+.pill.soon{background:var(--surface-2); color:var(--ink-3); border:1px solid var(--border-strong);}
+.card-name{font-size:17px; font-weight:600;}
+.card-tag{font-size:13px; color:var(--ink-2); margin-top:8px; line-height:1.5; flex:1;}
+.card-go{display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--coral-deep); margin-top:18px;}
+
+/* ---------- login ---------- */
+.login-wrap{min-height:100vh; display:grid; place-items:center; padding:24px;}
+.login-card{background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:34px 32px; width:min(420px,100%); box-shadow:0 24px 60px -18px rgba(11,11,11,.28);}
+.login-card .brand{margin-bottom:24px;}
+.login-card h1{font-size:23px;}
+.login-card p.lead{font-size:14px; color:var(--ink-2); margin:8px 0 24px;}
+.field label{display:block; font-size:12px; font-weight:600; color:var(--ink-2); margin-bottom:7px;}
+.field input{width:100%; border:1px solid var(--border-strong); border-radius:11px; padding:12px 14px; font-size:14px; font-family:inherit;}
+.field input:focus{outline:none; border-color:var(--coral); box-shadow:0 0 0 3px rgba(237,88,71,.16);}
+.btn-primary{width:100%; margin-top:16px; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--coral); color:#fff; border:none; border-radius:11px; padding:13px 16px; font-size:14px; font-weight:600; transition:background .15s;}
+.btn-primary:hover{background:var(--coral-50);}
+.btn-primary:disabled{opacity:.6; cursor:default;}
+.msg{margin-top:16px; font-size:13px; line-height:1.55; min-height:18px;}
+.msg.err{color:var(--coral-deep);}
+.msg.ok{color:var(--ink-2);}
+.sent-box{text-align:center; padding:8px 0;}
+.sent-box .ic{width:54px; height:54px; border-radius:50%; display:grid; place-items:center; margin:0 auto 16px; background:#FDECE9; color:var(--coral-deep);}
+.link-btn{background:none; border:none; color:var(--coral-deep); font-weight:600; font-size:13px; padding:0; margin-top:14px; text-decoration:underline;}
+
+.hidden{display:none !important;}
+.empty{margin-top:34px; padding:40px; text-align:center; color:var(--ink-3); border:1px dashed var(--border-strong); border-radius:18px;}
+</style>
+</head>
+<body>
+
+<!-- ============ ÉCRAN DE CONNEXION ============ -->
+<div class="login-wrap hidden" id="loginScreen">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark"><span data-icon="aperture" data-size="20"></span></div>
+      <div><div class="brand-name">Snapshot Media</div><div class="brand-sub">Dashboard</div></div>
+    </div>
+
+    <div id="loginForm">
+      <h1>Connexion</h1>
+      <p class="lead">Saisissez votre email. Nous vous enverrons un lien de connexion sécurisé.</p>
+      <form onsubmit="requestLink(event)">
+        <div class="field">
+          <label for="email">Adresse email</label>
+          <input type="email" id="email" placeholder="vous@snapshotmedia.ch" autocomplete="email" required />
+        </div>
+        <button class="btn-primary" type="submit" id="loginBtn"><span data-icon="mail" data-size="17"></span> Recevoir le lien</button>
+      </form>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div class="sent-box hidden" id="sentBox">
+      <div class="ic"><span data-icon="mail-check" data-size="26"></span></div>
+      <h1>Vérifiez vos emails</h1>
+      <p class="lead">Si cette adresse est autorisée, un lien de connexion vient d'être envoyé. Il expire dans 15&nbsp;minutes.</p>
+      <button class="link-btn" onclick="resetLogin()">Utiliser une autre adresse</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PORTAIL ============ -->
+<div class="hidden" id="portal">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><span data-icon="aperture" data-size="20"></span></div>
+      <div><div class="brand-name">Snapshot Media</div><div class="brand-sub">Dashboard</div></div>
+    </div>
+    <div class="user-box">
+      <span class="user-email" id="userEmail"></span>
+      <button class="logout-btn" onclick="logout()"><span data-icon="logout" data-size="15"></span> Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="page-kicker">Espace interne</div>
+    <h1 class="page-title">Vos applications</h1>
+    <p class="page-lead">Le répertoire des outils Snapshot Media. Sélectionnez une application pour l'ouvrir.</p>
+    <div class="grid" id="appGrid"></div>
+  </main>
+</div>
+
+<script>
+/* ====================== ICÔNES (Lucide inline — MIT) ====================== */
+const ICONS={
+  aperture:'<circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  'mail-check':'<path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="m16 19 2 2 4-4"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+  house:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  grid:'<rect width="7" height="9" x="3" y="3" rx="1.5"/><rect width="7" height="5" x="14" y="3" rx="1.5"/><rect width="7" height="9" x="14" y="12" rx="1.5"/><rect width="7" height="5" x="3" y="16" rx="1.5"/>',
+  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'
+};
+function icon(name,size=18){return `<svg class="ic-svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||''}</svg>`;}
+function initIcons(root=document){root.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=icon(el.dataset.icon,+(el.dataset.size||18));});}
+
+const $=id=>document.getElementById(id);
+
+async function api(path,opts={}){
+  const res=await fetch('/api'+path,{credentials:'same-origin',headers:{'Content-Type':'application/json'},...opts});
+  if(!res.ok){ const e=new Error('HTTP '+res.status); e.status=res.status; throw e; }
+  const ct=res.headers.get('content-type')||'';
+  return ct.includes('application/json')?res.json():null;
+}
+
+/* ---------- boot : me ? portail : login ---------- */
+async function boot(){
+  initIcons();
+  // Nettoie un éventuel ?error=... laissé par le callback magic-link.
+  const params=new URLSearchParams(location.search);
+  try{
+    const me=await api('/auth/me');
+    showPortal(me);
+  }catch(err){
+    showLogin(params.get('error'));
+  }
+}
+
+function showLogin(error){
+  $('loginScreen').classList.remove('hidden');
+  $('portal').classList.add('hidden');
+  if(error){
+    const map={invalid_token:'Lien invalide.', token_expired:'Ce lien a expiré ou a déjà été utilisé.'};
+    $('loginMsg').textContent=map[error]||'Connexion impossible, réessayez.';
+    $('loginMsg').className='msg err';
+    history.replaceState(null,'',location.pathname);
+  }
+}
+
+async function showPortal(me){
+  $('loginScreen').classList.add('hidden');
+  $('portal').classList.remove('hidden');
+  $('userEmail').textContent=me.email;
+  try{
+    const {apps}=await api('/apps');
+    renderApps(apps);
+  }catch(e){ renderApps([]); }
+}
+
+function renderApps(apps){
+  const grid=$('appGrid');
+  if(!apps||!apps.length){ grid.innerHTML='<div class="empty">Aucune application pour le moment.</div>'; return; }
+  grid.innerHTML=apps.map(a=>{
+    const soon=a.status==='soon';
+    return `<a class="app-card ${a.accent?'accent':''} ${soon?'soon':''}" ${soon?'':`href="${a.href}"`}>
+      <div class="card-top">
+        <div class="card-icon">${icon(a.icon||'grid',22)}</div>
+        <span class="pill ${soon?'soon':'live'}">${soon?'À venir':'En ligne'}</span>
+      </div>
+      <div class="card-name">${a.name}</div>
+      <div class="card-tag">${a.tagline||''}</div>
+      ${soon?'':`<span class="card-go">Ouvrir ${icon('arrow',15)}</span>`}
+    </a>`;
+  }).join('');
+}
+
+/* ---------- login magic-link ---------- */
+async function requestLink(e){
+  e.preventDefault();
+  const email=$('email').value.trim();
+  const btn=$('loginBtn'); btn.disabled=true;
+  $('loginMsg').textContent='';
+  try{
+    await api('/auth/login',{method:'POST',body:JSON.stringify({email})});
+    $('loginForm').classList.add('hidden');
+    $('sentBox').classList.remove('hidden');
+  }catch(err){
+    $('loginMsg').textContent = err.status===429 ? 'Trop de tentatives, patientez une minute.' : 'Envoi impossible, réessayez.';
+    $('loginMsg').className='msg err';
+  }finally{ btn.disabled=false; }
+}
+function resetLogin(){
+  $('sentBox').classList.add('hidden');
+  $('loginForm').classList.remove('hidden');
+  $('loginMsg').textContent=''; $('email').value='';
+}
+function logout(){ api('/auth/logout',{method:'POST'}).catch(()=>{}).then(()=>location.reload()); }
+
+boot();
+</script>
+</body>
+</html>

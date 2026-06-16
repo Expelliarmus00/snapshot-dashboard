@@ -10,7 +10,9 @@ export interface AppEntry {
   href: string;
   icon: string; // clé d'icône Lucide (voir public/index.html)
   status: 'live' | 'soon';
+  category: 'media' | 'prive'; // « Snapshot Media » (métier) ou « Privé » (perso)
   accent?: boolean;
+  repo?: string; // URL du repo GitHub (menu actions rapides)
 }
 
 export const APPS: AppEntry[] = [
@@ -21,6 +23,8 @@ export const APPS: AppEntry[] = [
     href: 'https://patrimoine.snapshotmedia.ch',
     icon: 'house',
     status: 'live',
+    category: 'prive',
     accent: true,
+    repo: 'https://github.com/Expelliarmus00/snapshot-patrimoine',
   },
 ];

@@ -23,6 +23,19 @@ const ConfigSchema = z.object({
         .map((e) => e.trim().toLowerCase())
         .filter(Boolean),
     ),
+  // Propriétaires : seuls ces emails voient les apps de catégorie « privé ».
+  // Vide = tout utilisateur connecté est traité comme propriétaire (aucun filtrage).
+  OWNER_EMAILS: z
+    .string()
+    .optional()
+    .transform((s) =>
+      s
+        ? s
+            .split(',')
+            .map((e) => e.trim().toLowerCase())
+            .filter(Boolean)
+        : [],
+    ),
   MAGIC_LINK_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(30),
 

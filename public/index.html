@@ -16,7 +16,7 @@
 :root{
   --canvas:#ECECEC; --surface:#FFFFFF; --surface-2:#F5F5F5;
   --border:#EAEAEA; --border-strong:#CFCFCF;
-  --ink:#0B0B0B; --ink-2:#4A4D54; --ink-3:#8A8A8A;
+  --ink:#0B0B0B; --ink-2:#4A4D54; --ink-3:#767676; /* aligné sur theme.css du kit (WCAG AA 4.54:1) */
   --forest:#1D2026; --coral:#ED5847; --coral-50:#E53A26; --coral-deep:#B82D1C; --coral-soft:#F6ABA2;
   --font-display:'Switzer',-apple-system,sans-serif;
   --font-body:'Satoshi',-apple-system,sans-serif;
@@ -59,6 +59,34 @@ button{font-family:inherit; cursor:pointer;}
 .card-name{font-size:17px; font-weight:600;}
 .card-tag{font-size:13px; color:var(--ink-2); margin-top:8px; line-height:1.5; flex:1;}
 .card-go{display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--coral-deep); margin-top:18px;}
+
+/* ---------- onglets (catégories) ---------- */
+.tabs{display:inline-flex; gap:4px; margin-top:30px; padding:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:13px;}
+.tab{display:inline-flex; align-items:center; gap:8px; border:none; background:none; color:var(--ink-2); font-size:13.5px; font-weight:600; padding:8px 16px; border-radius:9px; transition:background .15s, color .15s;}
+.tab:hover{color:var(--ink);}
+.tab.active{background:var(--surface); color:var(--ink); box-shadow:var(--sh);}
+.tab .tab-count{font-size:11px; font-weight:700; color:var(--ink-3); background:var(--canvas); border-radius:6px; padding:1px 7px;}
+.tab.active .tab-count{color:var(--coral-deep); background:#FDECE9;}
+
+/* ---------- statut santé ---------- */
+.card-status{display:inline-flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;}
+.status-dot{width:8px; height:8px; border-radius:50%; flex:none; background:var(--ink-3);}
+.status-dot.ok{background:#3FAE6B; box-shadow:0 0 0 3px rgba(63,174,107,.16);}
+.status-dot.down{background:var(--coral); box-shadow:0 0 0 3px rgba(237,88,71,.16);}
+.status-dot.unknown{background:var(--border-strong);}
+.card-status.ok{color:#2E8451;} .card-status.down{color:var(--coral-deep);} .card-status.unknown,.card-status.checking{color:var(--ink-3);}
+
+/* ---------- menu actions rapides ---------- */
+.app-card{position:relative;}
+.app-card.clickable{cursor:pointer;}
+.card-menu-btn{position:absolute; top:18px; right:18px; width:32px; height:32px; border-radius:9px; border:1px solid transparent; background:none; color:var(--ink-3); display:grid; place-items:center; transition:background .15s, color .15s, border-color .15s;}
+.card-menu-btn:hover{background:var(--surface-2); color:var(--ink); border-color:var(--border);}
+.card-menu{position:absolute; top:54px; right:18px; z-index:20; background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; box-shadow:0 12px 32px -8px rgba(11,11,11,.22); padding:6px; min-width:178px; display:none;}
+.card-menu.open{display:block;}
+.card-menu a{display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:8px; font-size:13px; font-weight:500; color:var(--ink); text-decoration:none;}
+.card-menu a:hover{background:var(--surface-2);}
+.card-menu a .ic-svg{width:16px; height:16px; color:var(--ink-3);}
+.card-menu .sep{height:1px; background:var(--border); margin:5px 4px;}
 
 /* ---------- login ---------- */
 .login-wrap{min-height:100vh; display:grid; place-items:center; padding:24px;}
@@ -132,6 +160,10 @@ button{font-family:inherit; cursor:pointer;}
     <div class="page-kicker">Espace interne</div>
     <h1 class="page-title">Vos applications</h1>
     <p class="page-lead">Le répertoire des outils Snapshot Media. Sélectionnez une application pour l'ouvrir.</p>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-cat="media"><span data-icon="grid" data-size="16"></span>Snapshot Media <span class="tab-count" id="count-media">0</span></button>
+      <button class="tab" data-cat="prive" id="tabPrive"><span data-icon="house" data-size="16"></span>Privé <span class="tab-count" id="count-prive">0</span></button>
+    </div>
     <div class="grid" id="appGrid"></div>
   </main>
 </div>
@@ -145,7 +177,12 @@ const ICONS={
   logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
   house:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
   grid:'<rect width="7" height="9" x="3" y="3" rx="1.5"/><rect width="7" height="5" x="14" y="3" rx="1.5"/><rect width="7" height="9" x="14" y="12" rx="1.5"/><rect width="7" height="5" x="3" y="16" rx="1.5"/>',
-  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'
+  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  more:'<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
+  activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  github:'<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  open:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'
 };
 function icon(name,size=18){return `<svg class="ic-svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||''}</svg>`;}
 function initIcons(root=document){root.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=icon(el.dataset.icon,+(el.dataset.size||18));});}
@@ -183,31 +220,105 @@ function showLogin(error){
   }
 }
 
+let ALL_APPS=[], HEALTH={}, activeCat='media';
+
 async function showPortal(me){
   $('loginScreen').classList.add('hidden');
   $('portal').classList.remove('hidden');
   $('userEmail').textContent=me.email;
   try{
     const {apps}=await api('/apps');
-    renderApps(apps);
-  }catch(e){ renderApps([]); }
+    ALL_APPS=apps||[];
+  }catch(e){ ALL_APPS=[]; }
+  setupTabs();
+  refreshHealth();
 }
 
-function renderApps(apps){
+const appsInCat=cat=>ALL_APPS.filter(a=>a.category===cat);
+
+function setupTabs(){
+  const nMedia=appsInCat('media').length, nPrive=appsInCat('prive').length;
+  $('count-media').textContent=nMedia;
+  $('count-prive').textContent=nPrive;
+  // Masque l'onglet Privé s'il est vide (ex. utilisateur non-propriétaire)
+  $('tabPrive').style.display = nPrive>0 ? '' : 'none';
+  const saved=localStorage.getItem('dashTab');
+  activeCat = ((saved==='prive'&&nPrive>0)||saved==='media') ? saved : (nMedia>0?'media':(nPrive>0?'prive':'media'));
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>selectTab(t.dataset.cat));
+  selectTab(activeCat);
+}
+
+function selectTab(cat){
+  if(cat==='prive' && appsInCat('prive').length===0) cat='media';
+  activeCat=cat; localStorage.setItem('dashTab',cat);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.cat===cat));
+  renderApps();
+}
+
+const statusLabel=s=>s==='ok'?'En ligne':s==='down'?'Hors ligne':'—';
+
+function renderApps(){
   const grid=$('appGrid');
-  if(!apps||!apps.length){ grid.innerHTML='<div class="empty">Aucune application pour le moment.</div>'; return; }
+  const apps=appsInCat(activeCat);
+  if(!apps.length){
+    grid.innerHTML=`<div class="empty">${activeCat==='media'?'Aucune app métier pour l\'instant.':'Aucune app privée.'}</div>`;
+    return;
+  }
   grid.innerHTML=apps.map(a=>{
     const soon=a.status==='soon';
-    return `<a class="app-card ${a.accent?'accent':''} ${soon?'soon':''}" ${soon?'':`href="${a.href}"`}>
+    const base=a.href.replace(/\/$/,'');
+    const h=HEALTH[a.slug]||(soon?'unknown':'checking');
+    const statusHtml = soon
+      ? '<span class="pill soon">À venir</span>'
+      : `<span class="card-status ${h}"><span class="status-dot ${h==='checking'?'unknown':h}"></span>${h==='checking'?'…':statusLabel(h)}</span>`;
+    const items=[];
+    if(!soon){
+      items.push(`<a href="${a.href}"><span data-icon="open"></span>Ouvrir</a>`);
+      items.push(`<a href="${base}/health" target="_blank" rel="noopener"><span data-icon="activity"></span>État (health)</a>`);
+    }
+    if(a.repo) items.push(`<a href="${a.repo}" target="_blank" rel="noopener"><span data-icon="github"></span>Repo GitHub</a>`);
+    if(!soon) items.push(`<a href="${base}/api/backup"><span data-icon="download"></span>Backup</a>`);
+    const menu = items.length ? `<button class="card-menu-btn" data-menu="${a.slug}" aria-label="Actions"><span data-icon="more" data-size="18"></span></button><div class="card-menu" id="menu-${a.slug}">${items.join('')}</div>` : '';
+    return `<div class="app-card ${a.accent?'accent':''} ${soon?'soon':'clickable'}" ${soon?'':`data-href="${a.href}"`}>
+      ${menu}
       <div class="card-top">
         <div class="card-icon">${icon(a.icon||'grid',22)}</div>
-        <span class="pill ${soon?'soon':'live'}">${soon?'À venir':'En ligne'}</span>
+        ${statusHtml}
       </div>
       <div class="card-name">${a.name}</div>
       <div class="card-tag">${a.tagline||''}</div>
       ${soon?'':`<span class="card-go">Ouvrir ${icon('arrow',15)}</span>`}
-    </a>`;
+    </div>`;
   }).join('');
+  initIcons(grid);
+  wireCards(grid);
+}
+
+function wireCards(grid){
+  grid.querySelectorAll('.app-card.clickable').forEach(c=>{
+    c.addEventListener('click', e=>{
+      if(e.target.closest('.card-menu')||e.target.closest('.card-menu-btn')) return;
+      if(c.dataset.href) location.href=c.dataset.href;
+    });
+  });
+  grid.querySelectorAll('.card-menu-btn').forEach(b=>{
+    b.addEventListener('click', e=>{
+      e.stopPropagation();
+      const m=$('menu-'+b.dataset.menu), open=m.classList.contains('open');
+      closeMenus();
+      if(!open) m.classList.add('open');
+    });
+  });
+}
+function closeMenus(){ document.querySelectorAll('.card-menu.open').forEach(m=>m.classList.remove('open')); }
+document.addEventListener('click', closeMenus);
+
+async function refreshHealth(){
+  try{
+    const {health}=await api('/apps/health');
+    HEALTH=health||{};
+    if(!$('portal').classList.contains('hidden')) renderApps();
+  }catch(e){}
 }
 
 /* ---------- login magic-link ---------- */

@@ -27,4 +27,14 @@ export const APPS: AppEntry[] = [
     accent: true,
     repo: 'https://github.com/Expelliarmus00/snapshot-patrimoine',
   },
+  {
+    slug: 'budget',
+    name: 'Budget Ménage',
+    tagline: 'Enveloppes, acomptes & cashflow du ménage (Kevin, Aurélia, bébé)',
+    href: 'https://budget.snapshotmedia.ch',
+    icon: 'wallet',
+    status: 'live',
+    category: 'prive',
+    repo: 'https://github.com/snapshot-media/snapshot-budget',
+  },
 ];

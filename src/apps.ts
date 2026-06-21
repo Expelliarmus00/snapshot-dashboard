@@ -37,4 +37,14 @@ export const APPS: AppEntry[] = [
     category: 'prive',
     repo: 'https://github.com/snapshot-media/snapshot-budget',
   },
+  {
+    slug: 'fluxio',
+    name: 'Fluxio',
+    tagline: 'Coûts récurrents & seuil de rentabilité — combien gagner pour couvrir les frais fixes',
+    href: 'https://fluxio.snapshotmedia.ch',
+    icon: 'waves',
+    status: 'live',
+    category: 'media',
+    repo: 'https://github.com/snapshot-media/snapshot-fluxio',
+  },
 ];
